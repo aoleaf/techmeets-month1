@@ -100,8 +100,15 @@
       margin-bottom: 24px;
     }
 
-    .input-row input {
+    .input-fields {
       flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-row input {
+      width: 100%;
       padding: 10px 14px;
       border: 1.5px solid var(--border-input);
       border-radius: 8px;
@@ -114,6 +121,21 @@
 
     .input-row input:focus {
       border-color: var(--accent);
+    }
+
+    #date-input {
+      color-scheme: light;
+    }
+
+    body.dark #date-input {
+      color-scheme: dark;
+    }
+
+    .task-date {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .input-row button {
@@ -268,7 +290,10 @@
       <button class="theme-btn" id="theme-btn" title="テーマ切替">🌙</button>
     </div>
     <div class="input-row">
-      <input type="text" id="task-input" placeholder="タスクを入力..." maxlength="100">
+      <div class="input-fields">
+        <input type="text" id="task-input" placeholder="タスクを入力..." maxlength="100">
+        <input type="date" id="date-input">
+      </div>
       <button id="add-btn">追加</button>
     </div>
     <div class="filter-section">
@@ -295,6 +320,7 @@
     const themeBtn = document.getElementById('theme-btn');
     const filterBtns = document.querySelectorAll('.filter-btn');
     const searchBox = document.getElementById('search-box');
+    const dateInput = document.getElementById('date-input');
 
     filterBtns.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -368,6 +394,12 @@
         deleteBtn.addEventListener('click', () => deleteTask(index));
 
         li.appendChild(label);
+        if (task.date) {
+          const dateTag = document.createElement('span');
+          dateTag.className = 'task-date';
+          dateTag.textContent = task.date.replace(/-/g, '/');
+          li.appendChild(dateTag);
+        }
         li.appendChild(deleteBtn);
         taskList.appendChild(li);
       });
@@ -380,8 +412,9 @@
     function addTask() {
       const text = input.value.trim();
       if (!text) return;
-      tasks.push({ text, done: false });
+      tasks.push({ text, done: false, date: dateInput.value });
       input.value = '';
+      dateInput.value = '';
       saveTasks();
       render();
     }
