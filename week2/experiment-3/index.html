@@ -176,6 +176,11 @@
       opacity: 0.5;
     }
 
+    .task-item.overdue {
+      border-color: var(--delete);
+      background: rgba(252, 129, 129, 0.1);
+    }
+
     .task-label {
       flex: 1;
       font-size: 0.95rem;
@@ -378,10 +383,12 @@
         return;
       }
 
+      const today = new Date().toISOString().slice(0, 10);
       filtered.forEach(task => {
         const index = tasks.indexOf(task);
         const li = document.createElement('li');
-        li.className = 'task-item' + (task.done ? ' done' : '');
+        const isOverdue = task.date && task.date < today && !task.done;
+        li.className = 'task-item' + (task.done ? ' done' : '') + (isOverdue ? ' overdue' : '');
 
         const label = document.createElement('span');
         label.className = 'task-label';
