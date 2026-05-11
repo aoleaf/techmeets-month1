@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ToDoリスト</title>
+  <style>
+    :root {
+      --bg-page: #f0f4f8;
+      --bg-container: #ffffff;
+      --bg-task: #f7fafc;
+      --text-main: #1a202c;
+      --text-body: #2d3748;
+      --text-muted: #718096;
+      --text-done: #a0aec0;
+      --border-input: #cbd5e0;
+      --border-task: #e2e8f0;
+      --shadow: rgba(0, 0, 0, 0.10);
+      --accent: #667eea;
+      --accent-hover: #5a67d8;
+      --delete: #fc8181;
+    }
+
+    body.dark {
+      --bg-page: #0f1117;
+      --bg-container: #1a1d27;
+      --bg-task: #252836;
+      --text-main: #e2e8f0;
+      --text-body: #cbd5e0;
+      --text-muted: #718096;
+      --text-done: #4a5568;
+      --border-input: #4a5568;
+      --border-task: #2d3748;
+      --shadow: rgba(0, 0, 0, 0.40);
+      --accent: #667eea;
+      --accent-hover: #5a67d8;
+      --delete: #fc8181;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-page);
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 48px 16px;
+      min-height: 100vh;
+      transition: background 0.3s;
+    }
+
+    .container {
+      background: var(--bg-container);
+      border-radius: 16px;
+      box-shadow: 0 4px 24px var(--shadow);
+      padding: 32px;
+      width: 100%;
+      max-width: 480px;
+      height: fit-content;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      color: var(--text-main);
+      letter-spacing: 0.02em;
+    }
+
+    .theme-btn {
+      background: transparent;
+      border: 1.5px solid var(--border-task);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: border-color 0.2s, background 0.2s;
+      line-height: 1;
+    }
+
+    .theme-btn:hover {
+      border-color: var(--accent);
+      background: var(--bg-task);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .input-row input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border-input);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, background 0.3s, color 0.3s;
+      color: var(--text-body);
+      background: var(--bg-task);
+    }
+
+    .input-row input:focus {
+      border-color: var(--accent);
+    }
+
+    .input-row button {
+      padding: 10px 18px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .input-row button:hover {
+      background: var(--accent-hover);
+    }
+
+    #task-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: var(--bg-task);
+      border-radius: 10px;
+      border: 1.5px solid var(--border-task);
+      transition: opacity 0.2s, background 0.3s, border-color 0.3s;
+    }
+
+    .task-item.done {
+      opacity: 0.5;
+    }
+
+    .task-label {
+      flex: 1;
+      font-size: 0.95rem;
+      color: var(--text-body);
+      cursor: pointer;
+      word-break: break-all;
+      transition: text-decoration 0.15s, color 0.3s;
+    }
+
+    .task-item.done .task-label {
+      text-decoration: line-through;
+      color: var(--text-done);
+    }
+
+    .delete-btn {
+      padding: 4px 10px;
+      background: transparent;
+      border: 1.5px solid var(--delete);
+      color: var(--delete);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      flex-shrink: 0;
+    }
+
+    .delete-btn:hover {
+      background: var(--delete);
+      color: #fff;
+    }
+
+    .empty-msg {
+      text-align: center;
+      color: var(--text-done);
+      font-size: 0.9rem;
+      padding: 16px 0;
+    }
+
+    .task-count {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      text-align: right;
+    }
+
+    .task-count span {
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .filter-btn {
+      flex: 1;
+      padding: 7px 0;
+      background: transparent;
+      border: 1.5px solid var(--border-task);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+    }
+
+    .filter-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .filter-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>ToDoリスト</h1>
+      <button class="theme-btn" id="theme-btn" title="テーマ切替">🌙</button>
+    </div>
+    <div class="input-row">
+      <input type="text" id="task-input" placeholder="タスクを入力..." maxlength="100">
+      <button id="add-btn">追加</button>
+    </div>
+    <div class="filter-row">
+      <button class="filter-btn active" data-filter="all">全て</button>
+      <button class="filter-btn" data-filter="active">未完了</button>
+      <button class="filter-btn" data-filter="done">完了</button>
+    </div>
+    <p class="task-count" id="task-count"></p>
+    <ul id="task-list"></ul>
+  </div>
+
+  <script>
+    const tasks = [];
+    let currentFilter = 'all';
+
+    const input = document.getElementById('task-input');
+    const addBtn = document.getElementById('add-btn');
+    const taskList = document.getElementById('task-list');
+    const taskCount = document.getElementById('task-count');
+    const themeBtn = document.getElementById('theme-btn');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentFilter = btn.dataset.filter;
+        filterBtns.forEach(b => b.classList.toggle('active', b === btn));
+        render();
+      });
+    });
+
+    function applyTheme(dark) {
+      document.body.classList.toggle('dark', dark);
+      themeBtn.textContent = dark ? '☀️' : '🌙';
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+
+    themeBtn.addEventListener('click', () => {
+      applyTheme(!document.body.classList.contains('dark'));
+    });
+
+    applyTheme(localStorage.getItem('theme') === 'dark');
+
+    function render() {
+      taskList.replaceChildren();
+
+      const doneCount = tasks.filter(t => t.done).length;
+      taskCount.replaceChildren();
+      if (tasks.length > 0) {
+        const prefix = document.createTextNode('完了 ');
+        const badge = document.createElement('span');
+        badge.textContent = `${doneCount} / ${tasks.length}`;
+        const suffix = document.createTextNode(' 件');
+        taskCount.append(prefix, badge, suffix);
+      }
+
+      const filtered = tasks.filter(t => {
+        if (currentFilter === 'active') return !t.done;
+        if (currentFilter === 'done') return t.done;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        const msg = document.createElement('p');
+        msg.className = 'empty-msg';
+        msg.textContent = tasks.length === 0 ? 'タスクがありません' : '該当するタスクがありません';
+        taskList.appendChild(msg);
+        return;
+      }
+
+      filtered.forEach(task => {
+        const index = tasks.indexOf(task);
+        const li = document.createElement('li');
+        li.className = 'task-item' + (task.done ? ' done' : '');
+
+        const label = document.createElement('span');
+        label.className = 'task-label';
+        label.textContent = task.text;
+        label.addEventListener('click', () => toggleDone(index));
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.textContent = '削除';
+        deleteBtn.addEventListener('click', () => deleteTask(index));
+
+        li.appendChild(label);
+        li.appendChild(deleteBtn);
+        taskList.appendChild(li);
+      });
+    }
+
+    function addTask() {
+      const text = input.value.trim();
+      if (!text) return;
+      tasks.push({ text, done: false });
+      input.value = '';
+      render();
+    }
+
+    function toggleDone(index) {
+      tasks[index].done = !tasks[index].done;
+      render();
+    }
+
+    function deleteTask(index) {
+      tasks.splice(index, 1);
+      render();
+    }
+
+    addBtn.addEventListener('click', addTask);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') addTask();
+    });
+
+    render();
+  </script>
+</body>
+</html>
