@@ -5,6 +5,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ToDoリスト</title>
   <style>
+    :root {
+      --bg-page: #f0f4f8;
+      --bg-container: #ffffff;
+      --bg-task: #f7fafc;
+      --text-main: #1a202c;
+      --text-body: #2d3748;
+      --text-muted: #718096;
+      --text-done: #a0aec0;
+      --border-input: #cbd5e0;
+      --border-task: #e2e8f0;
+      --shadow: rgba(0, 0, 0, 0.10);
+      --accent: #667eea;
+      --accent-hover: #5a67d8;
+      --delete: #fc8181;
+    }
+
+    body.dark {
+      --bg-page: #0f1117;
+      --bg-container: #1a1d27;
+      --bg-task: #252836;
+      --text-main: #e2e8f0;
+      --text-body: #cbd5e0;
+      --text-muted: #718096;
+      --text-done: #4a5568;
+      --border-input: #4a5568;
+      --border-task: #2d3748;
+      --shadow: rgba(0, 0, 0, 0.40);
+      --accent: #667eea;
+      --accent-hover: #5a67d8;
+      --delete: #fc8181;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -12,29 +44,54 @@
     }
 
     body {
-      background: #f0f4f8;
+      background: var(--bg-page);
       font-family: 'Segoe UI', sans-serif;
       display: flex;
       justify-content: center;
       padding: 48px 16px;
       min-height: 100vh;
+      transition: background 0.3s;
     }
 
     .container {
-      background: #ffffff;
+      background: var(--bg-container);
       border-radius: 16px;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10);
+      box-shadow: 0 4px 24px var(--shadow);
       padding: 32px;
       width: 100%;
       max-width: 480px;
       height: fit-content;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
     }
 
     h1 {
       font-size: 1.6rem;
-      color: #1a202c;
-      margin-bottom: 24px;
+      color: var(--text-main);
       letter-spacing: 0.02em;
+    }
+
+    .theme-btn {
+      background: transparent;
+      border: 1.5px solid var(--border-task);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: border-color 0.2s, background 0.2s;
+      line-height: 1;
+    }
+
+    .theme-btn:hover {
+      border-color: var(--accent);
+      background: var(--bg-task);
     }
 
     .input-row {
@@ -46,21 +103,22 @@
     .input-row input {
       flex: 1;
       padding: 10px 14px;
-      border: 1.5px solid #cbd5e0;
+      border: 1.5px solid var(--border-input);
       border-radius: 8px;
       font-size: 0.95rem;
       outline: none;
-      transition: border-color 0.2s;
-      color: #2d3748;
+      transition: border-color 0.2s, background 0.3s, color 0.3s;
+      color: var(--text-body);
+      background: var(--bg-task);
     }
 
     .input-row input:focus {
-      border-color: #667eea;
+      border-color: var(--accent);
     }
 
     .input-row button {
       padding: 10px 18px;
-      background: #667eea;
+      background: var(--accent);
       color: #fff;
       border: none;
       border-radius: 8px;
@@ -71,7 +129,7 @@
     }
 
     .input-row button:hover {
-      background: #5a67d8;
+      background: var(--accent-hover);
     }
 
     #task-list {
@@ -86,10 +144,10 @@
       align-items: center;
       gap: 12px;
       padding: 12px 14px;
-      background: #f7fafc;
+      background: var(--bg-task);
       border-radius: 10px;
-      border: 1.5px solid #e2e8f0;
-      transition: opacity 0.2s;
+      border: 1.5px solid var(--border-task);
+      transition: opacity 0.2s, background 0.3s, border-color 0.3s;
     }
 
     .task-item.done {
@@ -99,22 +157,22 @@
     .task-label {
       flex: 1;
       font-size: 0.95rem;
-      color: #2d3748;
+      color: var(--text-body);
       cursor: pointer;
       word-break: break-all;
-      transition: text-decoration 0.15s;
+      transition: text-decoration 0.15s, color 0.3s;
     }
 
     .task-item.done .task-label {
       text-decoration: line-through;
-      color: #a0aec0;
+      color: var(--text-done);
     }
 
     .delete-btn {
       padding: 4px 10px;
       background: transparent;
-      border: 1.5px solid #fc8181;
-      color: #fc8181;
+      border: 1.5px solid var(--delete);
+      color: var(--delete);
       border-radius: 6px;
       font-size: 0.8rem;
       cursor: pointer;
@@ -123,33 +181,36 @@
     }
 
     .delete-btn:hover {
-      background: #fc8181;
+      background: var(--delete);
       color: #fff;
     }
 
     .empty-msg {
       text-align: center;
-      color: #a0aec0;
+      color: var(--text-done);
       font-size: 0.9rem;
       padding: 16px 0;
     }
 
     .task-count {
       font-size: 0.85rem;
-      color: #718096;
+      color: var(--text-muted);
       margin-bottom: 12px;
       text-align: right;
     }
 
     .task-count span {
       font-weight: 600;
-      color: #667eea;
+      color: var(--accent);
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>ToDoリスト</h1>
+    <div class="header">
+      <h1>ToDoリスト</h1>
+      <button class="theme-btn" id="theme-btn" title="テーマ切替">🌙</button>
+    </div>
     <div class="input-row">
       <input type="text" id="task-input" placeholder="タスクを入力..." maxlength="100">
       <button id="add-btn">追加</button>
@@ -165,6 +226,19 @@
     const addBtn = document.getElementById('add-btn');
     const taskList = document.getElementById('task-list');
     const taskCount = document.getElementById('task-count');
+    const themeBtn = document.getElementById('theme-btn');
+
+    function applyTheme(dark) {
+      document.body.classList.toggle('dark', dark);
+      themeBtn.textContent = dark ? '☀️' : '🌙';
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+
+    themeBtn.addEventListener('click', () => {
+      applyTheme(!document.body.classList.contains('dark'));
+    });
+
+    applyTheme(localStorage.getItem('theme') === 'dark');
 
     function render() {
       taskList.replaceChildren();
