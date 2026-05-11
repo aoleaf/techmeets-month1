@@ -204,10 +204,16 @@
       color: var(--accent);
     }
 
+    .filter-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
     .filter-row {
       display: flex;
       gap: 6px;
-      margin-bottom: 16px;
     }
 
     .filter-btn {
@@ -233,6 +239,26 @@
       color: #fff;
       font-weight: 600;
     }
+
+    .search-box {
+      width: 100%;
+      padding: 9px 14px;
+      border: 1.5px solid var(--border-input);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      outline: none;
+      color: var(--text-body);
+      background: var(--bg-task);
+      transition: border-color 0.2s, background 0.3s, color 0.3s;
+    }
+
+    .search-box:focus {
+      border-color: var(--accent);
+    }
+
+    .search-box::placeholder {
+      color: var(--text-muted);
+    }
   </style>
 </head>
 <body>
@@ -245,10 +271,13 @@
       <input type="text" id="task-input" placeholder="タスクを入力..." maxlength="100">
       <button id="add-btn">追加</button>
     </div>
-    <div class="filter-row">
-      <button class="filter-btn active" data-filter="all">全て</button>
-      <button class="filter-btn" data-filter="active">未完了</button>
-      <button class="filter-btn" data-filter="done">完了</button>
+    <div class="filter-section">
+      <div class="filter-row">
+        <button class="filter-btn active" data-filter="all">すべて</button>
+        <button class="filter-btn" data-filter="active">未完了のみ</button>
+        <button class="filter-btn" data-filter="done">完了済みのみ</button>
+      </div>
+      <input type="text" class="search-box" id="search-box" placeholder="キーワードで絞り込む...">
     </div>
     <p class="task-count" id="task-count"></p>
     <ul id="task-list"></ul>
@@ -257,6 +286,7 @@
   <script>
     const tasks = [];
     let currentFilter = 'all';
+    let currentSearch = '';
 
     const input = document.getElementById('task-input');
     const addBtn = document.getElementById('add-btn');
@@ -264,6 +294,7 @@
     const taskCount = document.getElementById('task-count');
     const themeBtn = document.getElementById('theme-btn');
     const filterBtns = document.querySelectorAll('.filter-btn');
+    const searchBox = document.getElementById('search-box');
 
     filterBtns.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -271,6 +302,11 @@
         filterBtns.forEach(b => b.classList.toggle('active', b === btn));
         render();
       });
+    });
+
+    searchBox.addEventListener('input', () => {
+      currentSearch = searchBox.value.trim();
+      render();
     });
 
     function applyTheme(dark) {
@@ -298,10 +334,14 @@
         taskCount.append(prefix, badge, suffix);
       }
 
+      const keyword = currentSearch.toLowerCase();
       const filtered = tasks.filter(t => {
-        if (currentFilter === 'active') return !t.done;
-        if (currentFilter === 'done') return t.done;
-        return true;
+        const matchesStatus =
+          currentFilter === 'all' ||
+          (currentFilter === 'active' && !t.done) ||
+          (currentFilter === 'done' && t.done);
+        const matchesSearch = keyword === '' || t.text.toLowerCase().includes(keyword);
+        return matchesStatus && matchesSearch;
       });
 
       if (filtered.length === 0) {
