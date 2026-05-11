@@ -284,7 +284,7 @@
   </div>
 
   <script>
-    const tasks = [];
+    const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
     let currentFilter = 'all';
     let currentSearch = '';
 
@@ -373,21 +373,28 @@
       });
     }
 
+    function saveTasks() {
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
     function addTask() {
       const text = input.value.trim();
       if (!text) return;
       tasks.push({ text, done: false });
       input.value = '';
+      saveTasks();
       render();
     }
 
     function toggleDone(index) {
       tasks[index].done = !tasks[index].done;
+      saveTasks();
       render();
     }
 
     function deleteTask(index) {
       tasks.splice(index, 1);
+      saveTasks();
       render();
     }
 
