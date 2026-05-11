@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      max-width: 800px;
+      width: 100%;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 48px 40px;
+      text-align: center;
+      color: #fff;
+    }
+
+    .avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 42px;
+      border: 3px solid rgba(255, 255, 255, 0.6);
+    }
+
+    .header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .header .title {
+      font-size: 0.95rem;
+      opacity: 0.85;
+      letter-spacing: 0.05em;
+    }
+
+    .body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+
+    .section {
+      padding: 32px 36px;
+    }
+
+    .section:first-child {
+      border-right: 1px solid #e8ecf0;
+    }
+
+    .section h2 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #667eea;
+      margin-bottom: 16px;
+    }
+
+    .about-text {
+      font-size: 0.9rem;
+      color: #555;
+      line-height: 1.7;
+    }
+
+    .contact-list {
+      list-style: none;
+      margin-top: 28px;
+    }
+
+    .contact-list h2 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #667eea;
+      margin-bottom: 16px;
+    }
+
+    .contact-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.88rem;
+      color: #444;
+      margin-bottom: 10px;
+    }
+
+    .contact-list .icon {
+      font-size: 1rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    .skill-item {
+      margin-bottom: 18px;
+    }
+
+    .skill-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 0.88rem;
+      color: #333;
+      font-weight: 600;
+    }
+
+    .skill-bar {
+      height: 8px;
+      background: #eef0f4;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .skill-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      transition: width 0.8s ease;
+    }
+
+    @media (max-width: 560px) {
+      .body {
+        grid-template-columns: 1fr;
+      }
+      .section:first-child {
+        border-right: none;
+        border-bottom: 1px solid #e8ecf0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <div class="avatar">👤</div>
+      <h1>山田 太郎</h1>
+      <p class="title">Frontend Engineer</p>
+    </div>
+
+    <div class="body">
+      <div class="section">
+        <h2>About Me</h2>
+        <p class="about-text">
+          Webフロントエンドの開発が好きなエンジニアです。
+          ユーザー体験を大切にしたUI設計と、シンプルで保守しやすいコードを心がけています。
+          新しい技術を学ぶことが趣味で、週末は個人プロジェクトに取り組んでいます。
+        </p>
+
+        <ul class="contact-list">
+          <h2>Contact</h2>
+          <li><span class="icon">📧</span> yamada@example.com</li>
+          <li><span class="icon">🐙</span> github.com/yamada</li>
+          <li><span class="icon">📍</span> 東京, 日本</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>Skills</h2>
+
+        <div class="skill-item">
+          <div class="skill-header"><span>HTML</span><span>90%</span></div>
+          <div class="skill-bar"><div class="skill-fill" style="width: 90%"></div></div>
+        </div>
+
+        <div class="skill-item">
+          <div class="skill-header"><span>CSS</span><span>80%</span></div>
+          <div class="skill-bar"><div class="skill-fill" style="width: 80%"></div></div>
+        </div>
+
+        <div class="skill-item">
+          <div class="skill-header"><span>JavaScript</span><span>70%</span></div>
+          <div class="skill-bar"><div class="skill-fill" style="width: 70%"></div></div>
+        </div>
+
+        <div class="skill-item">
+          <div class="skill-header"><span>React</span><span>60%</span></div>
+          <div class="skill-bar"><div class="skill-fill" style="width: 60%"></div></div>
+        </div>
+
+        <div class="skill-item">
+          <div class="skill-header"><span>Git</span><span>75%</span></div>
+          <div class="skill-bar"><div class="skill-fill" style="width: 75%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
