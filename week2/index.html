@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>積読管理</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Hiragino Kaku Gothic ProN', 'メイリオ', sans-serif;
+      background: #f5f0eb;
+      color: #333;
+      min-height: 100vh;
+      padding: 32px 16px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      color: #4a3728;
+      letter-spacing: 0.1em;
+    }
+
+    header p {
+      margin-top: 8px;
+      color: #7a6a5e;
+      font-size: 0.95rem;
+    }
+
+    .book-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      justify-content: center;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .book-card {
+      background: #fff;
+      border-radius: 12px;
+      width: 240px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      cursor: default;
+    }
+
+    .book-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.18);
+    }
+
+    .book-cover {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      background: #d6c9b8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      flex-shrink: 0;
+    }
+
+    .book-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .book-title {
+      font-size: 1rem;
+      font-weight: bold;
+      color: #2c1e14;
+      line-height: 1.4;
+    }
+
+    .book-desc {
+      font-size: 0.82rem;
+      color: #6b5b4e;
+      line-height: 1.6;
+    }
+
+    .book-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: auto;
+      padding-top: 10px;
+      border-top: 1px solid #ece4da;
+    }
+
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+    }
+
+    .meta-label {
+      color: #9a8070;
+      min-width: 52px;
+    }
+
+    .meta-value {
+      font-weight: 600;
+      color: #3d2b1f;
+    }
+
+    /* 読了状況バッジ */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 0.74rem;
+      font-weight: bold;
+    }
+    .badge-unread   { background: #fde8e8; color: #c0392b; }
+    .badge-reading  { background: #fef9e7; color: #d68910; }
+    .badge-done     { background: #e9f7ef; color: #1e8449; }
+
+    /* 優先度 */
+    .priority-high   { color: #c0392b; }
+    .priority-medium { color: #d68910; }
+    .priority-low    { color: #1e8449; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>📚 積読管理</h1>
+    <p>読みたい本・読んでいる本をまとめて管理しよう</p>
+  </header>
+
+  <div class="book-grid">
+
+    <!-- カード 1 -->
+    <article class="book-card">
+      <div class="book-cover">📖</div>
+      <div class="book-body">
+        <h2 class="book-title">Clean Code<br>読みやすいコードを書く技術</h2>
+        <p class="book-desc">優れたコードの書き方について実践的なガイドを提供する名著。リファクタリングの考え方が学べる。</p>
+        <div class="book-meta">
+          <div class="meta-row">
+            <span class="meta-label">読了状況</span>
+            <span class="badge badge-reading">読書中</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">ジャンル</span>
+            <span class="meta-value">プログラミング</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">優先度</span>
+            <span class="meta-value priority-high">★★★ 高</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">一言メモ</span>
+            <span class="meta-value">命名の章が特に参考になる</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- カード 2 -->
+    <article class="book-card">
+      <div class="book-cover">🌐</div>
+      <div class="book-body">
+        <h2 class="book-title">世界は夢組と<br>叶え組でできている</h2>
+        <p class="book-desc">夢を持つ人と夢を叶える人、それぞれの役割について考察したビジネス・自己啓発書。</p>
+        <div class="book-meta">
+          <div class="meta-row">
+            <span class="meta-label">読了状況</span>
+            <span class="badge badge-unread">未読</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">ジャンル</span>
+            <span class="meta-value">自己啓発</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">優先度</span>
+            <span class="meta-value priority-medium">★★☆ 中</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">一言メモ</span>
+            <span class="meta-value">友達のおすすめ</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- カード 3 -->
+    <article class="book-card">
+      <div class="book-cover">🔢</div>
+      <div class="book-body">
+        <h2 class="book-title">ゼロから作るDeep Learning</h2>
+        <p class="book-desc">PythonでゼロからDeep Learningを実装しながら理解を深める。数式が丁寧に解説されている。</p>
+        <div class="book-meta">
+          <div class="meta-row">
+            <span class="meta-label">読了状況</span>
+            <span class="badge badge-done">読了</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">ジャンル</span>
+            <span class="meta-value">機械学習</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">優先度</span>
+            <span class="meta-value priority-low">★☆☆ 低</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">一言メモ</span>
+            <span class="meta-value">実装しながら読むと理解が深まる</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- カード 4 -->
+    <article class="book-card">
+      <div class="book-cover">🎨</div>
+      <div class="book-body">
+        <h2 class="book-title">ノンデザイナーズ<br>デザインブック</h2>
+        <p class="book-desc">デザインの基本原則（近接・整列・反復・コントラスト）をわかりやすく解説した定番書。</p>
+        <div class="book-meta">
+          <div class="meta-row">
+            <span class="meta-label">読了状況</span>
+            <span class="badge badge-unread">未読</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">ジャンル</span>
+            <span class="meta-value">デザイン</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">優先度</span>
+            <span class="meta-value priority-high">★★★ 高</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">一言メモ</span>
+            <span class="meta-value">UI作る前に読みたい</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- カード 5 -->
+    <article class="book-card">
+      <div class="book-cover">💡</div>
+      <div class="book-body">
+        <h2 class="book-title">Think clearly<br>最新の学術研究から導いた、よりよい人生を送るための思考法</h2>
+        <p class="book-desc">52の思考ツールをもとに、より賢明な意思決定の方法を学ぶ。日常の判断ミスを減らせる。</p>
+        <div class="book-meta">
+          <div class="meta-row">
+            <span class="meta-label">読了状況</span>
+            <span class="badge badge-reading">読書中</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">ジャンル</span>
+            <span class="meta-value">思考法</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">優先度</span>
+            <span class="meta-value priority-medium">★★☆ 中</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">一言メモ</span>
+            <span class="meta-value">毎日1章ずつ読んでいる</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- カード 6 -->
+    <article class="book-card">
+      <div class="book-cover">🚀</div>
+      <div class="book-body">
+        <h2 class="book-title">FACTFULNESS<br>10の思い込みを乗り越え、データを基に世界を正しく見る習慣</h2>
+        <p class="book-desc">世界についての間違った思い込みをデータで覆し、事実に基づいた世界の見方を教えてくれる。</p>
+        <div class="book-meta">
+          <div class="meta-row">
+            <span class="meta-label">読了状況</span>
+            <span class="badge badge-done">読了</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">ジャンル</span>
+            <span class="meta-value">教養</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">優先度</span>
+            <span class="meta-value priority-low">★☆☆ 低</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">一言メモ</span>
+            <span class="meta-value">世界観が変わった一冊</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+  </div>
+
+</body>
+</html>
