@@ -1,12 +1,15 @@
 <?php
+// HTMLエスケープ（XSS対策）
 function h(string $str): string {
     return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
 }
 
-// step: 'input' → 'confirm' → 'complete'
+// 画面状態とエラー配列の初期化
+// 画面遷移ステップ（input → confirm → complete）
 $step   = $_POST['step'] ?? 'input';
 $errors = [];
 
+// フォーム入力値の初期化（POSTがあればその値を使用）
 $name    = trim($_POST['name']    ?? '');
 $email   = trim($_POST['email']   ?? '');
 $subject = trim($_POST['subject'] ?? '');
@@ -15,7 +18,7 @@ $message = trim($_POST['message'] ?? '');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($step === 'input') {
-        // --- 入力 → 確認 バリデーション ---
+        // --- 入力 → 確認：必須チェックと形式チェックを行う ---
         if ($name === '') {
             $errors['name'] = '名前を入力してください。';
         }
@@ -37,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // エラー時は $step を 'input' のまま維持
 
     } elseif ($step === 'confirm') {
-        // --- 確認 → 完了（ここで実際のメール送信などを行う） ---
+        // --- 確認 → 完了：メール送信などの最終処理を行う ---
         $step = 'complete';
     }
 }
@@ -256,7 +259,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <h1>お問い合わせ</h1>
 
   <form method="POST" action="contact.php" novalidate>
-    <input type="hidden" name="step" value="input">
+    <!-- 現在の画面ステップ（input）を次のPOSTに引き継ぐ -->
+    <input type="hidden" name="step" value="input"> 
 
     <div class="form-group">
       <label for="name">お名前<span class="required">必須</span></label>
@@ -329,7 +333,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <tr><th>メッセージ</th>     <td><?= h($message) ?></td></tr>
   </table>
 
-  <!-- 送信フォーム: 入力値を hidden で引き継ぐ -->
+  <!-- 入力内容を hidden で保持し、送信処理へ渡す -->
   <form method="POST" action="contact.php" id="confirmForm">
     <input type="hidden" name="step"    value="confirm">
     <input type="hidden" name="name"    value="<?= h($name) ?>">
@@ -340,6 +344,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <button type="submit" class="btn" id="submitBtn">この内容で送信する</button>
   </form>
 
+  <!-- 入力内容を保持したまま input 画面に戻る -->
   <form method="POST" action="contact.php">
     <input type="hidden" name="step"    value="input">
     <input type="hidden" name="name"    value="<?= h($name) ?>">
