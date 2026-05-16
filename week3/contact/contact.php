@@ -1,43 +1,45 @@
 <?php
-$errors = [];
-$submitted = false;
-
-$name    = '';
-$email   = '';
-$subject = '';
-$message = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name    = trim($_POST['name']    ?? '');
-    $email   = trim($_POST['email']   ?? '');
-    $subject = trim($_POST['subject'] ?? '');
-    $message = trim($_POST['message'] ?? '');
-
-    if ($name === '') {
-        $errors['name'] = '名前を入力してください。';
-    }
-
-    if ($email === '') {
-        $errors['email'] = 'メールアドレスを入力してください。';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors['email'] = '有効なメールアドレスを入力してください。';
-    }
-
-    if ($subject === '') {
-        $errors['subject'] = '件名を入力してください。';
-    }
-
-    if ($message === '') {
-        $errors['message'] = 'メッセージを入力してください。';
-    }
-
-    if (empty($errors)) {
-        $submitted = true;
-    }
-}
-
 function h(string $str): string {
     return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
+}
+
+// step: 'input' → 'confirm' → 'complete'
+$step   = $_POST['step'] ?? 'input';
+$errors = [];
+
+$name    = trim($_POST['name']    ?? '');
+$email   = trim($_POST['email']   ?? '');
+$subject = trim($_POST['subject'] ?? '');
+$message = trim($_POST['message'] ?? '');
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    if ($step === 'input') {
+        // --- 入力 → 確認 バリデーション ---
+        if ($name === '') {
+            $errors['name'] = '名前を入力してください。';
+        }
+        if ($email === '') {
+            $errors['email'] = 'メールアドレスを入力してください。';
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors['email'] = '有効なメールアドレスを入力してください。';
+        }
+        if ($subject === '') {
+            $errors['subject'] = '件名を入力してください。';
+        }
+        if ($message === '') {
+            $errors['message'] = 'メッセージを入力してください。';
+        }
+
+        if (empty($errors)) {
+            $step = 'confirm'; // 確認画面へ
+        }
+        // エラー時は $step を 'input' のまま維持
+
+    } elseif ($step === 'confirm') {
+        // --- 確認 → 完了（ここで実際のメール送信などを行う） ---
+        $step = 'complete';
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -76,10 +78,35 @@ function h(string $str): string {
       color: #1a1a2e;
     }
 
-    /* ---- form ---- */
-    .form-group {
-      margin-bottom: 1.25rem;
+    /* ステップ表示 */
+    .steps {
+      display: flex;
+      gap: 0;
+      margin-bottom: 2rem;
     }
+
+    .step-item {
+      flex: 1;
+      text-align: center;
+      font-size: .75rem;
+      font-weight: 600;
+      padding: .5rem .25rem;
+      color: #a0aec0;
+      border-bottom: 3px solid #e2e8f0;
+    }
+
+    .step-item.active {
+      color: #4299e1;
+      border-bottom-color: #4299e1;
+    }
+
+    .step-item.done {
+      color: #48bb78;
+      border-bottom-color: #48bb78;
+    }
+
+    /* フォーム */
+    .form-group { margin-bottom: 1.25rem; }
 
     label {
       display: block;
@@ -129,6 +156,7 @@ function h(string $str): string {
       margin-top: .3rem;
     }
 
+    /* ボタン */
     .btn {
       display: inline-block;
       width: 100%;
@@ -140,12 +168,28 @@ function h(string $str): string {
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background .2s;
+      transition: background .2s, opacity .2s;
     }
 
-    .btn:hover { background: #3182ce; }
+    .btn:hover:not(:disabled) { background: #3182ce; }
 
-    /* ---- confirm ---- */
+    .btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .btn-outline {
+      background: #fff;
+      color: #4299e1;
+      border: 1.5px solid #4299e1;
+      margin-top: .75rem;
+    }
+
+    .btn-outline:hover:not(:disabled) {
+      background: #ebf8ff;
+    }
+
+    /* 確認テーブル */
     .confirm-table {
       width: 100%;
       border-collapse: collapse;
@@ -169,15 +213,19 @@ function h(string $str): string {
 
     .confirm-table td { white-space: pre-wrap; word-break: break-word; }
 
-    .badge {
-      display: inline-block;
-      background: #ebf8ff;
-      color: #2b6cb0;
-      border-radius: 6px;
-      padding: .15rem .6rem;
-      font-size: .75rem;
-      font-weight: 700;
+    /* 完了アイコン */
+    .complete-icon {
+      font-size: 3rem;
+      text-align: center;
       margin-bottom: 1rem;
+    }
+
+    .complete-msg {
+      text-align: center;
+      color: #718096;
+      font-size: .95rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
     }
 
     .back-link {
@@ -195,39 +243,20 @@ function h(string $str): string {
 <body>
 <div class="card">
 
-<?php if ($submitted): ?>
+  <!-- ステップインジケーター -->
+  <div class="steps">
+    <div class="step-item <?= $step === 'input'   ? 'active' : 'done' ?>">① 入力</div>
+    <div class="step-item <?= $step === 'confirm'  ? 'active' : ($step === 'complete' ? 'done' : '') ?>">② 確認</div>
+    <div class="step-item <?= $step === 'complete' ? 'active' : '' ?>">③ 完了</div>
+  </div>
 
-  <!-- 確認画面 -->
-  <div class="badge">送信内容の確認</div>
-  <h1>お問い合わせを受け付けました</h1>
+<?php if ($step === 'input'): ?>
 
-  <table class="confirm-table">
-    <tr>
-      <th>お名前</th>
-      <td><?= h($name) ?></td>
-    </tr>
-    <tr>
-      <th>メールアドレス</th>
-      <td><?= h($email) ?></td>
-    </tr>
-    <tr>
-      <th>件名</th>
-      <td><?= h($subject) ?></td>
-    </tr>
-    <tr>
-      <th>メッセージ</th>
-      <td><?= h($message) ?></td>
-    </tr>
-  </table>
-
-  <a class="back-link" href="contact.php">← フォームに戻る</a>
-
-<?php else: ?>
-
-  <!-- 入力フォーム -->
+  <!-- ① 入力フォーム -->
   <h1>お問い合わせ</h1>
 
   <form method="POST" action="contact.php" novalidate>
+    <input type="hidden" name="step" value="input">
 
     <div class="form-group">
       <label for="name">お名前<span class="required">必須</span></label>
@@ -285,9 +314,67 @@ function h(string $str): string {
       <?php endif; ?>
     </div>
 
-    <button type="submit" class="btn">送信する</button>
-
+    <button type="submit" class="btn">確認画面へ</button>
   </form>
+
+<?php elseif ($step === 'confirm'): ?>
+
+  <!-- ② 確認画面 -->
+  <h1>入力内容の確認</h1>
+
+  <table class="confirm-table">
+    <tr><th>お名前</th>        <td><?= h($name) ?></td></tr>
+    <tr><th>メールアドレス</th> <td><?= h($email) ?></td></tr>
+    <tr><th>件名</th>           <td><?= h($subject) ?></td></tr>
+    <tr><th>メッセージ</th>     <td><?= h($message) ?></td></tr>
+  </table>
+
+  <!-- 送信フォーム: 入力値を hidden で引き継ぐ -->
+  <form method="POST" action="contact.php" id="confirmForm">
+    <input type="hidden" name="step"    value="confirm">
+    <input type="hidden" name="name"    value="<?= h($name) ?>">
+    <input type="hidden" name="email"   value="<?= h($email) ?>">
+    <input type="hidden" name="subject" value="<?= h($subject) ?>">
+    <input type="hidden" name="message" value="<?= h($message) ?>">
+
+    <button type="submit" class="btn" id="submitBtn">この内容で送信する</button>
+  </form>
+
+  <form method="POST" action="contact.php">
+    <input type="hidden" name="step"    value="input">
+    <input type="hidden" name="name"    value="<?= h($name) ?>">
+    <input type="hidden" name="email"   value="<?= h($email) ?>">
+    <input type="hidden" name="subject" value="<?= h($subject) ?>">
+    <input type="hidden" name="message" value="<?= h($message) ?>">
+    <button type="submit" class="btn btn-outline">← 入力内容を修正する</button>
+  </form>
+
+  <script>
+    document.getElementById('confirmForm').addEventListener('submit', function () {
+      var btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = '送信中...';
+    });
+  </script>
+
+<?php elseif ($step === 'complete'): ?>
+
+  <!-- ③ 完了画面 -->
+  <div class="complete-icon">&#10003;</div>
+  <h1 style="text-align:center;">送信完了</h1>
+  <p class="complete-msg">
+    お問い合わせを受け付けました。<br>
+    内容を確認のうえ、担当者よりご連絡いたします。
+  </p>
+
+  <table class="confirm-table">
+    <tr><th>お名前</th>        <td><?= h($name) ?></td></tr>
+    <tr><th>メールアドレス</th> <td><?= h($email) ?></td></tr>
+    <tr><th>件名</th>           <td><?= h($subject) ?></td></tr>
+    <tr><th>メッセージ</th>     <td><?= h($message) ?></td></tr>
+  </table>
+
+  <a class="back-link" href="contact.php">← トップに戻る</a>
 
 <?php endif; ?>
 
